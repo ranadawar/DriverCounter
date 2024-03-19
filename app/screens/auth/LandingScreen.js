@@ -10,7 +10,7 @@ const LandingScreen = () => {
   return (
     <View style={styles.mainContainer}>
       <View style={GlobleStyles.topContainer}>
-        <Text style={GlobleStyles.header}>Welcome to ZapX</Text>
+        <Text style={GlobleStyles.header}>Welcome to Driver Count</Text>
         <Text style={GlobleStyles.subHeader}>
           Choose how you want to continue
         </Text>

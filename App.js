@@ -3,11 +3,33 @@ import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { COLORS } from "./app/contants/theme";
 import AuthNavigator from "./app/navigations/AuthNavigator";
-import { useEffect, useState } from "react";
-
-import auth from "@react-native-firebase/auth";
+import React, { useEffect, useState } from "react";
+import {
+  onAuthStateChanged,
+  setPersistence,
+  browserSessionPersistence,
+} from "firebase/auth";
+import { LogBox } from "react-native";
+import { auth } from "./firebase";
+import AppNavigator from "./app/navigations/AppNavigator";
 
 export default function App() {
+  const [user, setUser] = useState(null);
+  LogBox.ignoreAllLogs();
+  React.useEffect(() => {
+    firebaseAuthState();
+  }, []);
+
+  const firebaseAuthState = () => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+  };
+
   const theme = {
     ...DefaultTheme,
     colors: {
@@ -15,22 +37,6 @@ export default function App() {
       background: COLORS.bg,
     },
   };
-
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
-
-  // Handle user state changes
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
-
-  if (initializing) return null;
 
   const [fontsLoaded] = useFonts({
     EncodeSansExtraBold: require("./assets/fonts/ExtraBold.ttf"),
@@ -46,8 +52,7 @@ export default function App() {
   }
   return (
     <NavigationContainer theme={theme}>
-      {/* <AppNavigator /> */}
-      <AuthNavigator />
+      {user ? <AppNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 }
